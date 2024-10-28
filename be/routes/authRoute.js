@@ -58,7 +58,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../modules/User');
+const User = require('../models/User');
 
 router.post('/signUp', async (req, res) => {
     try {

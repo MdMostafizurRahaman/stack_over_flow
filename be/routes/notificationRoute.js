@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const Notification = require('../modules/Notification')
+const Notification = require('../models/Notification')
 const authMiddleware = require('../middleware/authMiddleware')
 
 router.get('/notification', authMiddleware, async(req, res) => {
