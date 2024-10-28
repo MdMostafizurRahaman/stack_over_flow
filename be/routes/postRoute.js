@@ -8,7 +8,7 @@ const router = express.Router();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.post('/post', authMiddleware, upload.single('codeSnippet'), async (req, res) => {
+router.post('/post', authMiddleware, upload.single('file'), async (req, res) => {
     const { title, content } = req.body;
     let codeSnippetUrl = null; 
 
