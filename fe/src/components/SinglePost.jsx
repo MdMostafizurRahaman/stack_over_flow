@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const SinglePost = ({token}) => {
+const SinglePost = ({ token }) => {
   const { postId } = useParams(); // Get postId from the URL
   const [post, setPost] = useState(null);
 
@@ -23,25 +23,26 @@ const SinglePost = ({token}) => {
   }
 
   return (
-    <div className="p-4  bg-white rounded shadow">
+    <div className="p-4 bg-white rounded shadow">
       <h2 className="text-2xl font-bold">{post.title}</h2>
       <p className="mt-2">{post.content}</p>
+      <p className="text-gray-600 text-sm">Posted by: {post.email}</p> {/* Author's email */}
       {post.codeSnippetUrl && (
-              <a
-                href={post.codeSnippetUrl}
-                className="text-blue-500"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Code Snippet
-              </a>
-            )}
+        <a
+          href={post.codeSnippetUrl}
+          className="text-blue-500"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View Code Snippet
+        </a>
+      )}
     </div>
   );
-}
+};
 
 SinglePost.propTypes = {
   token: PropTypes.string.isRequired,
 };
 
-export default SinglePost
+export default SinglePost;

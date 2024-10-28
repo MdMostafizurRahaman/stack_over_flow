@@ -47,6 +47,7 @@ function Auth({ setToken }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-3xl font-bold mb-4 text-blue-500">Stack Overflow</h1>
       <div className="w-full max-w-xs">
         <input
           type="email"
@@ -64,7 +65,7 @@ function Auth({ setToken }) {
         />
         <button
           onClick={handleSignUp}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded mb-2"
+          className="w-full bg-sky-500 hover:bg-blue-600 text-white py-2 rounded mb-2"
         >
           Sign Up
         </button>
