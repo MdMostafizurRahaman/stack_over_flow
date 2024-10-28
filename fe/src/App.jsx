@@ -20,7 +20,7 @@ function App() {
           <Auth setToken={setToken} />
         ) : (
           <div className="container mx-auto">
-            <NavBar onLogout={handleLogout} /> {/* Use the NavBar component */}
+            <NavBar onLogout={handleLogout} /> 
 
             <Routes>
               <Route path="/" element={<PostList token={token} />} />

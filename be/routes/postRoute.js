@@ -5,7 +5,7 @@ const Post = require('../models/Post');
 const Notification = require('../models/Notification'); 
 const { minioClient, BUCKET_NAME } = require('../config/minio');
 const authMiddleware = require('../middleware/authMiddleware');
-const User = require('../models/User'); // Adjust the path if needed
+const User = require('../models/User'); 
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
