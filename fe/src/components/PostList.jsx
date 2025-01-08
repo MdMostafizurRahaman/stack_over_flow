@@ -14,23 +14,25 @@ function PostList({ token }) {
     fetchPosts();
   }, [token]);
 
-  const fetchPosts = async () => {
-    const res = await fetch(`http://localhost:3000/post`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setPosts(data);
-    setShowingUserPosts(false);
-  };
+  // Fetch posts based on showingUserPosts flag
+const fetchPosts = async () => {
+  const res = await fetch(`http://localhost:3000/post?myPosts=false`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  setPosts(data);
+  setShowingUserPosts(false);
+};
 
-  const fetchUserPosts = async () => {
-    const res = await fetch(`http://localhost:3000/mypost`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setPosts(data);
-    setShowingUserPosts(true);
-  };
+// Fetch user's posts
+const fetchUserPosts = async () => {
+  const res = await fetch(`http://localhost:3000/post?myPosts=true`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  setPosts(data);
+  setShowingUserPosts(true);
+};
 
   const handleCreatePost = async () => {
     const formData = new FormData();

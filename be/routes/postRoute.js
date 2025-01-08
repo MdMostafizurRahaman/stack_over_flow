@@ -55,16 +55,25 @@ router.post('/post', authMiddleware, upload.single('codeSnippet'), async (req, r
   }
 });
 
-
+// Get posts based on query parameter (myPosts)
 router.get('/post', authMiddleware, async (req, res) => {
-  const posts = await Post.find({ email: { $ne: req.user.email } });
-  res.json(posts);
+  const { myPosts } = req.query; // Get the myPosts query parameter
+
+  let filter = {};
+  if (myPosts === 'true') {
+    filter = { email: req.user.email };  // Fetch user's posts
+  } else if (myPosts === 'false' || myPosts === undefined) {
+    filter = { email: { $ne: req.user.email } };  // Fetch posts by others
+  }
+
+  try {
+    const posts = await Post.find(filter);
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-router.get('/mypost', authMiddleware, async (req, res) => {
-  const posts = await Post.find({ email: req.user.email });
-  res.json(posts);
-});
 
 router.get('/post/:id', authMiddleware, async (req, res) => {
   try {
