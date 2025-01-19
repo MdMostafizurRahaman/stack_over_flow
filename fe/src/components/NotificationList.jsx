@@ -14,7 +14,7 @@ function NotificationList({ token }) {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/notification`, {
+      const res = await fetch(`http://localhost:3002/notification`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -34,7 +34,7 @@ function NotificationList({ token }) {
 
   const viewPost = async (postId) => {
     try {
-      const res = await fetch(`http://localhost:3000/notification/markSeen`, {
+      const res = await fetch(`http://localhost:3002/notification/markSeen`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

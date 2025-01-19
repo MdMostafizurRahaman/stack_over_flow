@@ -16,7 +16,7 @@ function PostList({ token }) {
 
   // Fetch posts based on showingUserPosts flag
 const fetchPosts = async () => {
-  const res = await fetch(`http://localhost:3000/post?myPosts=false`, {
+  const res = await fetch(`http://localhost:3003/post?myPosts=false`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
@@ -26,7 +26,7 @@ const fetchPosts = async () => {
 
 // Fetch user's posts
 const fetchUserPosts = async () => {
-  const res = await fetch(`http://localhost:3000/post?myPosts=true`, {
+  const res = await fetch(`http://localhost:3003/post?myPosts=true`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
@@ -45,7 +45,7 @@ const fetchUserPosts = async () => {
       formData.append('language', language);
     }
 
-    const res = await fetch(`http://localhost:3000/post`, {
+    const res = await fetch(`http://localhost:3003/post`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
