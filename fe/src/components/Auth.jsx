@@ -7,7 +7,7 @@ function Auth({ setToken }) {
 
   const handleSignUp = async () => {
     try {
-      const res = await fetch('http://localhost:3000/signup', {
+      const res = await fetch('http://localhost:3001/users/signUp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -26,7 +26,7 @@ function Auth({ setToken }) {
 
   const handleSignIn = async () => {
     try {
-      const res = await fetch('http://localhost:3000/signIn', {
+      const res = await fetch('http://localhost:3001/users/signIn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

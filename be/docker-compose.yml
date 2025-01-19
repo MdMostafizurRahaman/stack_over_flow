@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # Ensure data is persistent
+    command: mongod --logpath /var/log/mongodb/mongod.log --logappend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  notification-service:
+    build:
+      context: ./notification-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - CONNECT_DB=mongodb://mongodb:27017/notification-service
+    volumes:
+      - ./notification-service:/usr/src/app
+    depends_on:
+      - mongodb
+
+  post-service:
+    build:
+      context: ./post-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - CONNECT_DB=mongodb://mongodb:27017/post-service
+    volumes:
+      - ./post-service:/usr/src/app
+    depends_on:
+      - minio
+      - mongodb
+
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+      - CONNECT_DB=mongodb://mongodb:27017/user-service
+    volumes:
+      - ./user-service:/usr/src/app
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ../fe
+    ports:
+      - "8096:80"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ../fe:/usr/src/app
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9011:9000"  # Change the external port to avoid conflicts
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    command: server /data
+    volumes:
+      - minio-data:/data
+
+volumes:
+  mongo-data:   
+  minio-data:
