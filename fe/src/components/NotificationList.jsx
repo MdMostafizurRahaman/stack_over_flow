@@ -1,40 +1,40 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 function NotificationList({ token }) {
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Fetching notifications with token:', token);
     fetchNotifications();
   }, [token]);
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch(`http://localhost:3002/notification`, {
+      const res = await fetch(`${config.notificationServiceUrl}/notification/unseen`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
       if (!res.ok) {
-        throw new Error('Failed to fetch notifications');
+        throw new Error(`Failed to fetch notifications: ${res.statusText}`);
       }
-
       const data = await res.json();
       setNotifications(data);
     } catch (err) {
-      console.error("Error fetching notifications:", err);
-      setError(err.message); 
+      console.error('Error fetching notifications:', err);
+      setError(err.message);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   const viewPost = async (postId) => {
     try {
-      const res = await fetch(`http://localhost:3002/notification/markSeen`, {
+      const res = await fetch(`${config.notificationServiceUrl}/notification/markSeen`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -50,19 +50,22 @@ function NotificationList({ token }) {
       navigate(`/post/${postId}`);
       fetchNotifications();
     } catch (error) {
-      console.error("Error marking notification as seen:", error);
-      setError(error.message); 
+      console.error('Error marking notification as seen:', error);
+      setError(error.message);
     }
   };
 
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Notifications</h2>
-      {loading && <p>Loading notifications...</p>} 
-      {error && <p className="text-red-500">{error}</p>} 
+      {loading && <p>Loading notifications...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {notifications.length > 0 ? (
-        notifications.map(notification => (
-          <div key={notification._id} className="p-4 mb-4 bg-white rounded shadow flex justify-between items-center">
+        notifications.map((notification) => (
+          <div
+            key={notification._id}
+            className="p-4 mb-4 bg-white rounded shadow flex justify-between items-center"
+          >
             <p className="mr-4">{notification.message}</p>
             <button
               onClick={() => viewPost(notification.postId)}
@@ -73,7 +76,7 @@ function NotificationList({ token }) {
           </div>
         ))
       ) : (
-        !loading && <p>No notifications available.</p> 
+        !loading && <p>No notifications available.</p>
       )}
     </div>
   );

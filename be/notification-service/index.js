@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors'); 
+const cors = require('cors');
 const notificationRoutes = require('./routes/notificationRoute');
 
 dotenv.config();
@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 3002;
 
 app.use(bodyParser.json());
-app.use(cors()); // Enable CORS
+app.use(cors());
 
 app.use('/notification', notificationRoutes);
 

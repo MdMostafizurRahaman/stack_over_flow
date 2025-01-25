@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import config from '../config';
 
 function PostList({ token }) {
   const [posts, setPosts] = useState([]);
@@ -10,31 +11,50 @@ function PostList({ token }) {
   const [isFileUpload, setIsFileUpload] = useState(false);
   const [showingUserPosts, setShowingUserPosts] = useState(false);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [token]);
+  const fetchPosts = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Retrieve token from localStorage
+      if (!token) {
+        console.error('No token found in localStorage.');
+        return;
+      }
+  
+      console.log('Full Authorization Header:', `Bearer ${token}`);
 
-  // Fetch posts based on showingUserPosts flag
-const fetchPosts = async () => {
-  const res = await fetch(`http://localhost:3003/post?myPosts=false`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  setPosts(data);
-  setShowingUserPosts(false);
-};
-
-// Fetch user's posts
-const fetchUserPosts = async () => {
-  const res = await fetch(`http://localhost:3003/post?myPosts=true`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  setPosts(data);
-  setShowingUserPosts(true);
-};
-
+      const response = await fetch('http://localhost:3003/post?myPosts=false', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in Authorization header
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Response status:', response.status);
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to fetch posts: ${errorText}`);
+      }
+  
+      const posts = await response.json();
+      console.log('Posts fetched:', posts);
+      setPosts(posts);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };  
+  
   const handleCreatePost = async () => {
+    if (isFileUpload && !file) {
+      alert('Please upload a file.');
+      return;
+    }
+
+    if (!isFileUpload && !language) {
+      alert('Please select a language.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', Array.isArray(content) ? content.join('\n') : content);
@@ -45,33 +65,51 @@ const fetchUserPosts = async () => {
       formData.append('language', language);
     }
 
-    const res = await fetch(`http://localhost:3003/post`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    // Retrieve the token from localStorage
+    const storedToken = localStorage.getItem('token');
+    
+    if (!storedToken) {
+      alert('Token is missing');
+      return;
+    }
 
-    if (res.ok) {
-      setTitle('');
-      setContent('');
-      setFile(null);
-      setLanguage('');
-      alert("Post created successfully");
-      fetchPosts();
-    } else {
-      const errorData = await res.json();
-      alert(`Error creating post: ${errorData.message}`);
+    try {
+      const res = await fetch(`${config.postServiceUrl}/post`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${storedToken}`,
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        setTitle('');
+        setContent('');
+        setFile(null);
+        setLanguage('');
+        alert('Post created successfully');
+        fetchPosts(); // Fetch updated posts based on the filter
+      } else {
+        const errorData = await res.json();
+        alert(`Error creating post: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      alert('Error creating post');
     }
   };
+
+  // Effect hook to fetch posts when the component loads
+  useEffect(() => {
+    fetchPosts(); // Fetch posts on mount
+  }, [showingUserPosts]);
 
   return (
     <div>
       <div className='flex justify-between m-4'>
         <h2 className="text-xl font-bold mb-4">Create a Post</h2>
         <button
-          onClick={showingUserPosts ? fetchPosts : fetchUserPosts}
+          onClick={() => setShowingUserPosts(!showingUserPosts)} // Update the state correctly
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-4"
         >
           {showingUserPosts ? "View Posts by Others" : "View My Posts"}
@@ -130,7 +168,6 @@ const fetchUserPosts = async () => {
             <h3 className="text-lg font-bold">{post.title}</h3>
             <p>{post.content}</p>
             <p className="text-gray-600 text-sm">Posted by: {post.email}</p>
-            
             {post.isFileUpload && post.folderName ? (
               <p className="text-gray-600 text-sm">Folder Name: {post.folderName}</p>
             ) : post.language ? (

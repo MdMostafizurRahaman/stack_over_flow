@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import config from '../config';
 
 function Auth({ setToken }) {
   const [email, setEmail] = useState('');
@@ -7,7 +8,7 @@ function Auth({ setToken }) {
 
   const handleSignUp = async () => {
     try {
-      const res = await fetch('http://localhost:3001/users/signUp', {
+      const res = await fetch(`${config.apiBaseUrl}/users/signUp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -26,7 +27,7 @@ function Auth({ setToken }) {
 
   const handleSignIn = async () => {
     try {
-      const res = await fetch('http://localhost:3001/users/signIn', {
+      const res = await fetch(`${config.apiBaseUrl}/users/signIn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -35,6 +36,11 @@ function Auth({ setToken }) {
       if (res.ok) {
         const data = await res.json();
         setToken(data.token);
+        
+        // Store the token in localStorage after successful login
+        localStorage.setItem('token', data.token);
+        console.log('Token saved to localStorage:', data.token);
+
         alert('Sign-in successful');
       } else {
         const errorData = await res.json();
