@@ -8,7 +8,7 @@ function Auth({ setToken }) {
 
   const handleSignUp = async () => {
     try {
-      const res = await fetch(`${config.apiBaseUrl}/users/signUp`, {
+      const res = await fetch(`${config.apiBaseUrl}/user/signUp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -27,7 +27,7 @@ function Auth({ setToken }) {
 
   const handleSignIn = async () => {
     try {
-      const res = await fetch(`${config.apiBaseUrl}/users/signIn`, {
+      const res = await fetch(`${config.apiBaseUrl}/user/signIn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

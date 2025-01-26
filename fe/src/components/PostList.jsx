@@ -1,159 +1,116 @@
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import config from '../config';
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 function PostList({ token }) {
   const [posts, setPosts] = useState([]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
-  const [language, setLanguage] = useState('');
-  const [isFileUpload, setIsFileUpload] = useState(false);
-  const [showingUserPosts, setShowingUserPosts] = useState(false);
+  const [fileExtension, setFileExtension] = useState("c");
+  const [showingUserPosts, setShowingUserPosts] = useState(false); // State to toggle view
+  const [codeSnippets, setCodeSnippets] = useState({});
+  useEffect(() => {
+    fetchPosts(); // Initially fetch posts by others
+  }, [token]);
 
   const fetchPosts = async () => {
-    try {
-      const token = localStorage.getItem('token'); // Retrieve token from localStorage
-      if (!token) {
-        console.error('No token found in localStorage.');
-        return;
-      }
-  
-      console.log('Full Authorization Header:', `Bearer ${token}`);
+    const res = await fetch(`http://localhost/post`, {
+     headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setPosts(data);
+    setShowingUserPosts(false); // Set to false when fetching posts by others
+  };
 
-      const response = await fetch('http://localhost:3003/post?myPosts=false', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Include token in Authorization header
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('Response status:', response.status);
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Failed to fetch posts: ${errorText}`);
-      }
-  
-      const posts = await response.json();
-      console.log('Posts fetched:', posts);
-      setPosts(posts);
+  const fetchUserPosts = async () => {
+    const res = await fetch(`http://localhost/post/mypost`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setPosts(data);
+    setShowingUserPosts(true); // Set to true when fetching user posts
+  };
+
+  const fetchCodeSnippet = async (url, postId) => {
+    try {
+      const res = await fetch(url);
+      const content = await res.text();
+      setCodeSnippets((prev) => ({ ...prev, [postId]: content })); // Store the content in state
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error("Error fetching code snippet:", error);
     }
-  };  
-  
+  };
   const handleCreatePost = async () => {
-    if (isFileUpload && !file) {
-      alert('Please upload a file.');
-      return;
-    }
-
-    if (!isFileUpload && !language) {
-      alert('Please select a language.');
-      return;
-    }
-
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', Array.isArray(content) ? content.join('\n') : content);
+    formData.append("title", title);
+    formData.append("fileExtension", fileExtension);
+    if (content) {
+      formData.append("content", content);
+    }
 
-    if (isFileUpload && file) {
-      formData.append('codeSnippet', file);
+    if (file) {
+      formData.append("codeSnippet", file);
+    }
+
+    const res = await fetch(`http://localhost/post`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (res.ok) {
+      setTitle("");
+      setContent("");
+      setFile(null);
+      alert("Post created successfully");
+      fetchPosts(); // Refresh posts after creating a new post
     } else {
-      formData.append('language', language);
-    }
-
-    // Retrieve the token from localStorage
-    const storedToken = localStorage.getItem('token');
-    
-    if (!storedToken) {
-      alert('Token is missing');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${config.postServiceUrl}/post`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${storedToken}`,
-        },
-        body: formData,
-      });
-
-      if (res.ok) {
-        setTitle('');
-        setContent('');
-        setFile(null);
-        setLanguage('');
-        alert('Post created successfully');
-        fetchPosts(); // Fetch updated posts based on the filter
-      } else {
-        const errorData = await res.json();
-        alert(`Error creating post: ${errorData.message}`);
-      }
-    } catch (error) {
-      console.error('Error creating post:', error);
-      alert('Error creating post');
+      alert("Error creating post");
     }
   };
 
-  // Effect hook to fetch posts when the component loads
-  useEffect(() => {
-    fetchPosts(); // Fetch posts on mount
-  }, [showingUserPosts]);
-
   return (
     <div>
-      <div className='flex justify-between m-4'>
+      <div className="flex justify-between m-4">
         <h2 className="text-xl font-bold mb-4">Create a Post</h2>
         <button
-          onClick={() => setShowingUserPosts(!showingUserPosts)} // Update the state correctly
+          onClick={showingUserPosts ? fetchPosts : fetchUserPosts} // Toggle between fetching user posts and others' posts
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-4"
         >
-          {showingUserPosts ? "View Posts by Others" : "View My Posts"}
-        </button>
-      </div>
-      <div>
-        <button onClick={() => setIsFileUpload(!isFileUpload)} className="bg-gray-300 py-2 px-4 rounded mb-4">
-          {isFileUpload ? 'Switch to Code Snippet' : 'Switch to File Upload'}
+          {showingUserPosts ? "View Posts by Others" : "View My Posts"}{" "}
+          {/* Dynamic button label */}
         </button>
       </div>
       <input
         type="text"
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
         className="block w-full p-2 mb-2 border rounded"
       />
-      {isFileUpload ? (
-        <input
-          type="file"
-          onChange={e => setFile(e.target.files[0])}
-          className="block w-full p-2 mb-2"
-        />
-      ) : (
-        <>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder="Code Snippet"
-            className="block w-full p-2 mb-2 border rounded"
-          />
-          <select
-            value={language}
-            onChange={e => setLanguage(e.target.value)}
-            className="block w-full p-2 mb-2 border rounded"
-          >
-            <option value="">Select Language</option>
-            <option value="c">C</option>
-            <option value="html">HTML</option>
-            <option value="cpp">C++</option>
-            <option value="python">Python</option>
-          </select>
-        </>
-      )}
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Content"
+        className="block w-full p-2 mb-2 border rounded"
+      />
+      <select
+        value={fileExtension}
+        onChange={(e) => setFileExtension(e.target.value)}
+        className="block w-full p-2 mb-2 border rounded"
+      >
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="java">Java</option>
+        <option value="py">Python</option>
+      </select>
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+        className="block w-full p-2 mb-2"
+      />
       <button
         onClick={handleCreatePost}
         className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-4"
@@ -161,28 +118,30 @@ function PostList({ token }) {
         Create Post
       </button>
 
-      <h2 className="text-xl font-bold mb-4">{showingUserPosts ? "My Posts" : "Posts by Others"}</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {showingUserPosts ? "My Posts" : "Posts by Others"}
+      </h2>
       {posts.length ? (
-        posts.map(post => (
+        posts.map((post) => (
           <div key={post._id} className="p-4 mb-4 bg-white rounded shadow">
             <h3 className="text-lg font-bold">{post.title}</h3>
-            <p>{post.content}</p>
-            <p className="text-gray-600 text-sm">Posted by: {post.email}</p>
-            {post.isFileUpload && post.folderName ? (
-              <p className="text-gray-600 text-sm">Folder Name: {post.folderName}</p>
-            ) : post.language ? (
-              <p className="text-gray-600 text-sm">Language: {post.language}</p>
-            ) : null}
 
             {post.codeSnippetUrl && (
-              <a
-                href={post.codeSnippetUrl}
-                className="text-blue-500"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View file
-              </a>
+              <>
+                <button
+                  onClick={() =>
+                    fetchCodeSnippet(post.codeSnippetUrl, post._id)
+                  }
+                  className="text-blue-500 mb-2"
+                >
+                  Load Code Snippet
+                </button>
+                {codeSnippets[post._id] && (
+                  <pre className="bg-gray-100 p-2 rounded">
+                    <code>{codeSnippets[post._id]}</code>
+                  </pre>
+                )}
+              </>
             )}
           </div>
         ))

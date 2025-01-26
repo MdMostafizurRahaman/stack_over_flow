@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(cors()); // Add this line
 
 // Routes
-app.use('/users', userRoutes);
+app.use('/user', userRoutes);
 
 // Database connection
 mongoose.connect(process.env.CONNECT_DB)
