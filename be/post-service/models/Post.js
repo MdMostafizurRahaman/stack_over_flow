@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String },
   codeSnippetUrl: { type: String },
-  fileExtension: String, 
+  fileExtension: { type: String} , 
 });
 
 module.exports = mongoose.model('Post', postSchema);
