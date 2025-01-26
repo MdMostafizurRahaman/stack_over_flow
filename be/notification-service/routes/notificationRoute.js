@@ -50,32 +50,27 @@ router.post('/markSeen', authMiddleware, async (req, res) => {
 });
 
 // Create a new notification
-router.post('/create', authMiddleware, async (req, res) => {
-  if (!req.user || !req.user.email) {
-    console.log('Unauthorized request: No user email in token');
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  const { email, postId, message,unseenBy } = req.body;
-
+router.post('/create', async (req, res) => {
   try {
+    const { email, postId, message, unseenBy } = req.body;
+
+    // Create and save the notification
     const notification = new Notification({
       email,
       postId,
       message,
-      unseenBy: Array.isArray(unseenBy) ? unseenBy : [], // Initially empty array for unseen users
+      unseenBy, // Add the user to the unseenBy array
     });
 
     await notification.save();
 
-    console.log('Notification created successfully:', notification);
     res.status(201).json({
       message: 'Notification created successfully.',
       notification,
     });
   } catch (error) {
     console.error('Error creating notification:', error);
-    res.status(500).json({ message: 'Error creating notification', error });
+    res.status(500).json({ message: 'Internal server error.' });
   }
 });
 

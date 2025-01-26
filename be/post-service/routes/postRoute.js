@@ -10,7 +10,7 @@ const axios=require('axios');
 const { unsubscribe } = require('diagnostics_channel');
 
 ///create post
-router.post('/post',authMiddleware,upload.single('codeSnippet'),async(req,res)=>{
+router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)=>{
   const { title, content,fileExtension } = req.body;
   let codeSnippetUrl = null;
 
@@ -20,7 +20,6 @@ router.post('/post',authMiddleware,upload.single('codeSnippet'),async(req,res)=>
 
     // Upload content-based file to MinIO
     await minioClient.putObject(BUCKET_NAME, fileName, fileBuffer);
-    //codeSnippetUrl = `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${BUCKET_NAME}/${fileName}`;
     codeSnippetUrl = `http://localhost:${process.env.MINIO_PORT}/${BUCKET_NAME}/${fileName}`;
   }
   if (req.file) {
@@ -70,7 +69,7 @@ router.get('/post',authMiddleware, async(req,res)=>{
 
 //get own post
 
-router.get('/post/mypost',authMiddleware, async(req,res)=>{
+router.get('/post/mypost', authMiddleware, async(req,res)=>{
   const posts = await Post.find({ email: { $eq: req.user.email } });
   res.json(posts);
 })
