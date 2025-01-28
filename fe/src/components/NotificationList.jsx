@@ -40,7 +40,7 @@ function NotificationList({ token }) {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ postId }),
+        body: JSON.stringify({ notificationId: postId }),
       });
 
       if (!res.ok) {

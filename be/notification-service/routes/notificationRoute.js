@@ -32,7 +32,7 @@ router.post('/markSeen', authMiddleware, async (req, res) => {
 
   const { notificationId } = req.body;
   const userEmail = req.user.email;
-
+  
   try {
     const result = await Notification.updateOne(
       { _id: notificationId },
