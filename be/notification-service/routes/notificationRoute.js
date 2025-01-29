@@ -34,17 +34,18 @@ router.post('/markSeen', authMiddleware, async (req, res) => {
   const userEmail = req.user.email;
 
   try {
-    const result = await Notification.updateOne(
-      { _id: notificationId },
-      { $pull: { unseenBy: userEmail } } // Remove user from unseenBy array
+    const notification = await Notification.findOneAndUpdate(
+      { _id: notificationId, unseenBy: userEmail }, // Ensure user is in unseenBy
+      { $set: { unseenBy: [] } }, // Remove all unseenBy
+      { new: true }
     );
-    console.log('Notification marked as seen:', result);
-    if (result.modifiedCount === 0) {
+    
+
+    if (!notification) {
       return res.status(404).json({ message: 'Notification not found or already seen.' });
     }
     res.status(200).json({ message: 'Notification marked as seen successfully.' });
   } catch (error) {
-    console.error('Error marking notification as seen:', error);
     res.status(500).json({ message: 'Error marking notification as seen', error });
   }
 });

@@ -32,7 +32,9 @@ function NotificationList({ token }) {
     }
   };
 
-  const viewPost = async (postId) => {
+  const viewPost = async (notificationId, postId) => {
+    console.log("Marking notification as seen:", notificationId, "Post ID:", postId);
+    
     try {
       const res = await fetch(`http://localhost/notification/markSeen`, {
         method: 'POST',
@@ -40,21 +42,21 @@ function NotificationList({ token }) {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ postId }),
+        body: JSON.stringify({ notificationId }),
       });
-
+  
       if (!res.ok) {
         throw new Error('Failed to mark notification as seen');
       }
-
-      navigate(`/post/${postId}`);
+  
+      navigate(`/post/${postId}`); // Ensure correct postId is used
       fetchNotifications();
     } catch (error) {
       console.error('Error marking notification as seen:', error);
       setError(error.message);
     }
   };
-
+  
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Notifications</h2>
@@ -68,7 +70,7 @@ function NotificationList({ token }) {
           >
             <p className="mr-4">{notification.message}</p>
             <button
-              onClick={() => viewPost(notification.postId)}
+              onClick={() => viewPost(notification._id,notification.postId)}
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
             >
               View Post
