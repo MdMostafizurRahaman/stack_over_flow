@@ -10,8 +10,8 @@ const axios=require('axios');
 const { unsubscribe } = require('diagnostics_channel');
 
 //create post
-router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)=>{
-  const { title, content,fileExtension } = req.body;
+router.post('/post', authMiddleware, upload.single('codeSnippet'), async (req, res) => {
+  const { title, content, fileExtension } = req.body;
   let codeSnippetUrl = null;
 
   if (content && fileExtension) {
@@ -22,43 +22,43 @@ router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)
     await minioClient.putObject(BUCKET_NAME, fileName, fileBuffer);
     codeSnippetUrl = `http://localhost:${process.env.MINIO_PORT}/${BUCKET_NAME}/${fileName}`;
   }
+
   if (req.file) {
     const objectName = `${crypto.randomBytes(16).toString('hex')}-${req.file.originalname}`;
     await minioClient.putObject(BUCKET_NAME, objectName, req.file.buffer);
   
     codeSnippetUrl = `http://localhost:${process.env.MINIO_PORT}/${BUCKET_NAME}/${objectName}`;
-
   }
 
-  const post = new Post({ email: req.user.email, title, content, codeSnippetUrl,fileExtension }); 
+  // Create and save the post
+  const post = new Post({ email: req.user.email, title, content, codeSnippetUrl, fileExtension });
   await post.save();
 
+  try {
+    // Fetch all users' emails by calling user service API
+    const usersResponse = await axios.get('http://user-service:3001/user/users/');
+    const users = usersResponse.data;
+    console.log('Fetched users:', users);
+    const unseenByEmails = users.map(user => user.email);  // Extract emails
 
-try {
-  
-  const notificationServiceUrl = `http://notification-service:3002/notification/create`;
+    // Send notification to all users
+    const notificationServiceUrl = `http://notification-service:3002/notification/create`;
 
+    await axios.post(notificationServiceUrl, {
+      email: req.user.email,
+      postId: post._id,
+      message: `New post: ${title}`,
+      unseenBy: unseenByEmails  // Store all users' emails in unseenBy
+    });
 
-  // Perform the POST request to create a notification
-  await axios.post(notificationServiceUrl, {
-    email: req.user.email,
-    postId: post._id,
-    message: `New post: ${title}`,
-    unseenBy: [req.user.email]
-  });
-
-  // Log success for debugging purposes (optional)
-  console.log('Notification created successfully');
-} catch (error) {
-  // Log the error for debugging
-  console.error('Error creating notification:', error.message);
-
-  // Send an error response to the client if necessary
-  return res.status(500).json({ message: 'Failed to create notification' });
-}
+    console.log('Notification created successfully');
+  } catch (error) {
+    console.error('Error creating notification:', error.message);
+    return res.status(500).json({ message: 'Failed to create notification' });
+  }
 
   res.status(201).json({ message: 'Post created successfully' });
-})
+});
 
 //get post of others
 router.get('/post',authMiddleware, async(req,res)=>{

@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Sign Up route
 router.post('/signUp', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -25,6 +26,7 @@ router.post('/signUp', async (req, res) => {
     }
 });
 
+// Sign In route
 router.post('/signIn', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -49,6 +51,16 @@ router.post('/signIn', async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message });  
+    }
+});
+
+// Get all users route
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find();  // Fetch all users
+        res.status(200).json(users);  // Send users in response
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error });
     }
 });
 
