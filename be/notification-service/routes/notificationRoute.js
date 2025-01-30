@@ -11,8 +11,6 @@ router.get('/unseen', authMiddleware, async (req, res) => {
   }
 
   const userEmail = req.user.email;
-  console.log('Fetching notifications for:', userEmail);
-
   try {
     const notifications = await Notification.find({ unseenBy: userEmail });
     console.log('Notifications fetched:', notifications);
