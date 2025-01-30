@@ -9,7 +9,7 @@ const router = express.Router()
 const axios=require('axios');
 const { unsubscribe } = require('diagnostics_channel');
 
-///create post
+//create post
 router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)=>{
   const { title, content,fileExtension } = req.body;
   let codeSnippetUrl = null;
@@ -30,7 +30,7 @@ router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)
 
   }
 
-  const post = new Post({ email: req.user.email, title, content, codeSnippetUrl,fileExtension }); ////confusion user table nai but paitase kothay
+  const post = new Post({ email: req.user.email, title, content, codeSnippetUrl,fileExtension }); 
   await post.save();
 
 
@@ -61,14 +61,12 @@ try {
 })
 
 //get post of others
-
 router.get('/post',authMiddleware, async(req,res)=>{
   const posts = await Post.find({ email: { $ne: req.user.email } });
   res.json(posts);
 })
 
 //get own post
-
 router.get('/post/mypost', authMiddleware, async(req,res)=>{
   const posts = await Post.find({ email: { $eq: req.user.email } });
   res.json(posts);
