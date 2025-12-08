@@ -29,21 +29,21 @@ jobs:
       with:
         context: ./be/user-service
         push: true
-        tags: ghcr.io/${{ github.repository }}/user-service:latest
+        tags: ghcr.io/mdmostafizurrahaman/stack-over-flow-user-service:latest
 
     - name: Build and push post-service
       uses: docker/build-push-action@v5
       with:
         context: ./be/post-service
         push: true
-        tags: ghcr.io/${{ github.repository }}/post-service:latest
+        tags: ghcr.io/mdmostafizurrahaman/stack-over-flow-post-service:latest
 
     - name: Build and push notification-service
       uses: docker/build-push-action@v5
       with:
         context: ./be/notification-service
         push: true
-        tags: ghcr.io/${{ github.repository }}/notification-service:latest
+        tags: ghcr.io/mdmostafizurrahaman/stack-over-flow-notification-service:latest
 
     - name: Build frontend
       run: |

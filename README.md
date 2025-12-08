@@ -76,7 +76,8 @@ The application is containerized and can be deployed to any cloud platform suppo
 
 ### Cloud Deployment (Example)
 1. Push images to GitHub Container Registry (ghcr.io) via CI/CD
-2. Use `deploy.sh` script on your server (update with your repo name)
+   - Images: `ghcr.io/mdmostafizurrahaman/stack-over-flow-user-service:latest` etc.
+2. Use `deploy.sh` script on your server
 3. Or deploy to cloud platforms with Docker support
 
 ### Live Demo for Hackathon
