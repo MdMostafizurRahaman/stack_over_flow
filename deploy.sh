@@ -3,10 +3,13 @@
 # Simple deployment script for hackathon demo
 # Run this on your server after CI/CD builds images
 
+echo "Logging into GitHub Container Registry..."
+echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
 echo "Pulling latest images..."
-docker pull yourusername/user-service:latest
-docker pull yourusername/post-service:latest
-docker pull yourusername/notification-service:latest
+docker pull ghcr.io/yourusername/stack_over_flow/user-service:latest
+docker pull ghcr.io/yourusername/stack_over_flow/post-service:latest
+docker pull ghcr.io/yourusername/stack_over_flow/notification-service:latest
 
 echo "Stopping existing containers..."
 docker-compose down

@@ -75,13 +75,13 @@ The application is containerized and can be deployed to any cloud platform suppo
 3. Access at http://localhost
 
 ### Cloud Deployment (Example)
-1. Push images to Docker Hub via CI/CD
-2. Use `deploy.sh` script on your server
+1. Push images to GitHub Container Registry (ghcr.io) via CI/CD
+2. Use `deploy.sh` script on your server (update with your repo name)
 3. Or deploy to cloud platforms with Docker support
 
 ### Live Demo for Hackathon
 - Push code changes to trigger GitHub Actions
-- Actions build and push images
+- Actions build and push images to ghcr.io
 - Run deploy script to update running services
 - Show Grafana dashboards updating in real-time
 
