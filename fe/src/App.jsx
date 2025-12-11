@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <BrowserRouter>
+      <BrowserRouter basename="/stack_over_flow">
         {!token ? (
           <Auth setToken={setToken} />
         ) : (

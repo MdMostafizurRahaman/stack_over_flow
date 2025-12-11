@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import config from '../config';
 
 const SinglePost = ({token}) => {
   const { postId } = useParams(); // Get postId from the URL
@@ -11,7 +12,7 @@ const SinglePost = ({token}) => {
   }, [postId]);
 
   const fetchPost = async () => {
-    const res = await fetch(`http://localhost/post/${postId}`, {
+    const res = await fetch(`${config.postServiceUrl}/post/${postId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();

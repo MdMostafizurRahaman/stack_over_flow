@@ -37,6 +37,22 @@ const createBucketIfNotExists = async () => {
     } else {
       console.log(`Bucket "${BUCKET_NAME}" already exists.`);
     }
+
+    // Set bucket policy to allow public read access
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${BUCKET_NAME}/*`],
+        },
+      ],
+    };
+
+    await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy));
+    console.log(`Bucket policy set for "${BUCKET_NAME}" - public read access enabled.`);
   } catch (error) {
     console.error('Error:', error);
   }

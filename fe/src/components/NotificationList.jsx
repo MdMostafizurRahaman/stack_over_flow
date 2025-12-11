@@ -16,7 +16,7 @@ function NotificationList({ token }) {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch(`http://localhost/notification/unseen`, {
+      const res = await fetch(`${config.notificationServiceUrl}/notification/unseen`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -36,7 +36,7 @@ function NotificationList({ token }) {
     console.log("Marking notification as seen:", notificationId, "Post ID:", postId);
     
     try {
-      const res = await fetch(`http://localhost/notification/markSeen`, {
+      const res = await fetch(`${config.notificationServiceUrl}/notification/markSeen`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

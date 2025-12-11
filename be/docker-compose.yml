@@ -16,8 +16,6 @@ services:
       - "3001:3001"
     env_file:
       - ./user-service/.env
-    depends_on:
-      - user-db
 
   post-service:
     build: ./post-service
@@ -26,7 +24,6 @@ services:
     env_file:
       - ./post-service/.env
     depends_on:
-      - post-db
       - notification-service
       - minio
 
@@ -36,8 +33,6 @@ services:
       - "3002:3002"
     env_file:
       - ./notification-service/.env
-    depends_on:
-      - notification-db
 
 
   minio:
@@ -48,27 +43,6 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
-
-  user-db:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - user-data:/data/db
-
-  post-db:
-    image: mongo:latest
-    ports:
-      - "27018:27017"
-    volumes:
-      - post-data:/data/db
-
-  notification-db:
-    image: mongo:latest
-    ports:
-      - "27019:27017"
-    volumes:
-      - notification-data:/data/db
 
 #for protheus
 
@@ -102,9 +76,6 @@ services:
       - prometheus
 
 volumes:
-  user-data:
-  post-data:
-  notification-data:
   minio-data:
-  prometheus_data: #also add here
+  prometheus_data:
   grafana_data:

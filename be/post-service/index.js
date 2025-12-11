@@ -41,7 +41,7 @@ app.get('/metrics', async (req, res) => {
 
 app.use('/', postRoutes); 
 
-mongoose.connect(process.env.CONNECT_DB, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.CONNECT_DB)
     .then(() => console.log('MongoDB connected...'))
     .catch(err => console.log(err));
 

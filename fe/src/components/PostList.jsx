@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import config from "../config";
 
 function PostList({ token }) {
   const [posts, setPosts] = useState([]);
@@ -14,7 +15,7 @@ function PostList({ token }) {
   }, [token]);
 
   const fetchPosts = async () => {
-    const res = await fetch(`http://localhost/post`, {
+    const res = await fetch(`${config.postServiceUrl}/post`, {
      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -23,7 +24,7 @@ function PostList({ token }) {
   };
 
   const fetchUserPosts = async () => {
-    const res = await fetch(`http://localhost/post/mypost`, {
+    const res = await fetch(`${config.postServiceUrl}/post/mypost`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -52,7 +53,7 @@ function PostList({ token }) {
       formData.append("codeSnippet", file);
     }
 
-    const res = await fetch(`http://localhost/post`, {
+    const res = await fetch(`${config.postServiceUrl}/post`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
