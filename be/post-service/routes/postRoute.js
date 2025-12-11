@@ -20,13 +20,13 @@ router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)
 
     // Upload content-based file to MinIO
     await minioClient.putObject(BUCKET_NAME, fileName, fileBuffer);
-    codeSnippetUrl = `http://localhost:${process.env.MINIO_PORT}/${BUCKET_NAME}/${fileName}`;
+    codeSnippetUrl = `${process.env.STORAGE_BASE_URL}/${BUCKET_NAME}/${fileName}`;
   }
   if (req.file) {
     const objectName = `${crypto.randomBytes(16).toString('hex')}-${req.file.originalname}`;
     await minioClient.putObject(BUCKET_NAME, objectName, req.file.buffer);
   
-    codeSnippetUrl = `http://localhost:${process.env.MINIO_PORT}/${BUCKET_NAME}/${objectName}`;
+    codeSnippetUrl = `${process.env.STORAGE_BASE_URL}/${BUCKET_NAME}/${objectName}`;
 
   }
 
