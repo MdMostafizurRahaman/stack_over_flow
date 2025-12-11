@@ -31,7 +31,12 @@ router.post('/post',authMiddleware, upload.single('codeSnippet'), async(req,res)
   }
 
   const post = new Post({ email: req.user.email, title, content, codeSnippetUrl,fileExtension }); ////confusion user table nai but paitase kothay
-  await post.save();
+  try {
+    await post.save();
+  } catch (error) {
+    console.error('Error saving post:', error.message);
+    return res.status(400).json({ message: 'Failed to create post', error: error.message });
+  }
 
 
 try {

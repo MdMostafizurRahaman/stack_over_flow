@@ -42,6 +42,10 @@ function PostList({ token }) {
     }
   };
   const handleCreatePost = async () => {
+    if (!title.trim()) {
+      alert("Title is required");
+      return;
+    }
     const formData = new FormData();
     formData.append("title", title);
     formData.append("fileExtension", fileExtension);
